@@ -1,0 +1,6 @@
+role,permissionName,actionCode,check
+admin,Create user,CREATE_USER,1
+admin,Get all users,GET_USERS,1
+admin,Update user,UPDATE_USERS,1
+admin,Delete user,DELETE_USER,1
+admin,Create qr code,CREATE_QR,1
