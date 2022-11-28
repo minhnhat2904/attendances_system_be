@@ -18,6 +18,14 @@ export const Leave = (sequelize, Sequelize) => {
             type: Sequelize.DATE,
             required: true,
         },
+        amountDay: {
+            type: Sequelize.INTEGER,
+            required: true,
+        },
+        amountHour: {
+            type: Sequelize.INTEGER,
+            required: true,
+        },
         typeOff: {
             type: Sequelize.STRING,
             required: true,

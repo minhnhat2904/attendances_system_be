@@ -10,6 +10,10 @@ export const QRCode = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             required: true,
         },
+        key: {
+            type: Sequelize.STRING,
+            require: true
+        },
         deletedFlag: {
             type: Sequelize.BOOLEAN,
             defaultValue: false,

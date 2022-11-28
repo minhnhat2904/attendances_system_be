@@ -55,36 +55,96 @@ router.route('/api/auth/profile').put(
 );
 
 // QRCODE
-router.route('/api/qrcode').post(
+router.route('/api/qrcodes').post(
     jwtMiddleware,
     checkPermission(ACTION_CODE.CREATE_QR),
     qrCodeController.create
 );
 
+router.route('/api/qrCodes').get(
+    jwtMiddleware,
+    qrCodeController.get
+)
+
 // WORKDAY
-router.route('/api/workday').post(
+router.route('/api/workdays').post(
     jwtMiddleware,
     workDayController.create
 )
 
-router.route('/api/workday/user').get(
+router.route('/api/workdays').get(
     jwtMiddleware,
-    workDayController.getByUser
+    workDayController.get
 )
 
-router.route('/api/workday').get(
+router.route('/api/workdays/:id').get(
     jwtMiddleware,
-    workDayController.getAll
+    workDayController.getById
+)
+
+router.route('/api/workdays/:id').put(
+    jwtMiddleware,
+    workDayController.update
+)
+
+router.route('/api/workdays').delete(
+    jwtMiddleware,
+    workDayController.destroy
 )
 
 // LEAVE
-router.route('/api/leave').post(
+router.route('/api/leaves').post(
     jwtMiddleware,
     leaveController.create
 )
 
+router.route('/api/leaves/:id').put(
+    jwtMiddleware,
+    leaveController.update
+)
+
+router.route('/api/leaves').get(
+    jwtMiddleware,
+    leaveController.get
+)
+
+router.route('/api/leaves/:id').get(
+    jwtMiddleware,
+    leaveController.getById
+)
+
+router.route('/api/leaves').delete(
+    jwtMiddleware,
+    leaveController.destroy
+)
+
 // REPORT
-router.route('/api/report').post(
+router.route('/api/reports').post(
     jwtMiddleware,
     reportController.create
+)
+
+router.route('/api/reports/:id').put(
+    jwtMiddleware,
+    reportController.update
+)
+
+router.route('/api/reports').get(
+    jwtMiddleware,
+    reportController.get
+)
+
+router.route('/api/reports/:id').get(
+    jwtMiddleware,
+    reportController.getById
+)
+
+router.route('/api/reports').delete(
+    jwtMiddleware,
+    reportController.destroy
+)
+
+router.route('/api/totalHourWork').get(
+    jwtMiddleware,
+    workDayController.getTotalHourWork
 )
