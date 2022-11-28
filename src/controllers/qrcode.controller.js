@@ -47,7 +47,7 @@ const get = async (req, res, next) => {
             {
                 replacements: { createdAt: createdAt },
                 type: QueryTypes.SELECT,
-                logging: console.log 
+                logging: console.log
             });
         if (qr.length === 0) {
             throw new HttpError("Not found", 400);
