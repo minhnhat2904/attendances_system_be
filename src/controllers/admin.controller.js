@@ -27,7 +27,7 @@ const login = async (req, res, next) => {
         };
         const token = tokenEncode(data);
         res.status(200).json({
-            status: 200,
+            status: true,
             message: 'Success',
 			data: token,
         })
@@ -69,7 +69,7 @@ const createUser = async (req, res, next) => {
 		await Promise.all(permissions);
 
 		res.status(200).json({
-			status: 200,
+			status: true,
 			msg: 'Create user success',
 		});
 	} catch (error) {

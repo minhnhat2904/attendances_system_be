@@ -1,7 +1,7 @@
 import { HttpError, checkRoleAndPermision } from "../utils";
 
 const checkPermission = (permissionCode) => async (req, res, next) => {
-    const { id } = req.user;
+    console.log(id);
     try {
 		const hasPermission = await checkRoleAndPermision(id, permissionCode);
         if (!hasPermission) {

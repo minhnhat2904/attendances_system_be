@@ -60,7 +60,7 @@ const updatePassword = async (req, res, next) => {
             { where: { id: user.id } }
         )
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: result
         });
@@ -84,7 +84,7 @@ const resetPassword = async (req, res, next) => {
             { where: { id: user.id } }
         )
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: {password}
         });
@@ -103,7 +103,7 @@ const profile = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: user,
         });
@@ -124,7 +124,7 @@ const updateProfile = async (req, res, next) => {
     )
     
     res.status(200).json({
-        status: 200,
+        status: true,
         msg: "Success",
         data: result
     });

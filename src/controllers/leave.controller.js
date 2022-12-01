@@ -9,9 +9,9 @@ const create = async (req, res, next) => {
     const user = req.user;
     try {
         const exist = await db.sequelize.query(
-            'SELECT * FROM "leaves" WHERE "userId" = :userId AND (("startDate" < :startDate) OR ("startDate" < :endDate)) AND (("endDate" > :startDate) OR ("endDate" > :endDate))',
+            `SELECT * FROM "leaves" WHERE "userId" = :userId AND (("startDate" < '${startDate}') OR ("startDate" < '${endDate}')) AND (("endDate" > '${startDate}') OR ("endDate" > '${endDate}'))`,
             {
-                replacements: { userId: req.user.id, startDate: startDate, endDate: endDate },
+                replacements: { userId: req.user.id},
                 type: QueryTypes.SELECT,
                 logging: console.log
             });
@@ -73,7 +73,7 @@ const get = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: leave,
         });
@@ -92,7 +92,7 @@ const getById = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: leave,
         });
@@ -116,7 +116,7 @@ const destroy = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: result,
         });

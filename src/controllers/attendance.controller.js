@@ -6,7 +6,7 @@ const attendance = async (req, res, next) => {
 	const { qrCode } = req.body;
     try {
         res.status(200).json({
-            status: 200,
+            status: true,
             message: 'Success',
             data: 'True'
         })

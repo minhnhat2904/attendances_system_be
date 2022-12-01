@@ -54,7 +54,7 @@ const get = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: qr,
         });

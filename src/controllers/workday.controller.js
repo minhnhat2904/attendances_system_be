@@ -77,7 +77,7 @@ const getById = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: workDay,
         });
@@ -120,7 +120,7 @@ const destroy = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 200,
+            status: true,
             msg: "Success",
             data: result,
         });
