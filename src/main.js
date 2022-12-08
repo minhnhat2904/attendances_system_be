@@ -1,5 +1,5 @@
 import { HttpServer, envVariables } from "./configs";
-import { initAccountAdmin } from "./utils";
+import { initAccountAdmin, initDepartment } from "./utils";
 import { db } from "../src/models";
 import log from 'datalog';
 
@@ -32,6 +32,7 @@ const main = async () => {
     server.registerRouter(router);
 
     initAccountAdmin();
+    initDepartment();
     server.registerMiddleware(handleError);
 };
 main();

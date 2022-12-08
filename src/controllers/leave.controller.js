@@ -3,6 +3,7 @@ import { HttpError } from '../utils';
 const { QueryTypes } = require('sequelize');
 
 const Leave = db.leave;
+const Account = db.account;
 
 const create = async (req, res, next) => {
     const { startDate, endDate, typeOff, reason, reasonDetail, status, receiver, amountDay, amountHour } = req.body;
@@ -19,6 +20,12 @@ const create = async (req, res, next) => {
         if (exist.length !== 0) {
             throw new HttpError('Cannot create leave permits.', 400);
         }
+        const account = await Account.findOne({ where: { id: user.id } })
+        console.log(account.remainHours);
+        console.log((amountDay*8 + amountHour));
+        await Account.update({
+            remainHours: parseFloat(account.remainHours - (amountDay*8 + amountHour)).toFixed(1)
+        }, { where: { id: account.id } })
         const leave = await Leave.create({
             userId: req.user.id,
             startDate,
@@ -65,17 +72,20 @@ const update = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const userId = req.query.userId;
-        let leave = await Leave.findAll({ where: { userId: userId, deletedFlag: false } })
-
-        if (leave.length === 0) {
-            throw new HttpError("Not found", 400);
-        }
+        const { startDate, endDate, status, userId } = req.query;
+        // let leave = await Leave.findAll({ where: { userId: userId, deletedFlag: false } })
+        let leave = await db.sequelize.query(
+            'SELECT * FROM "leaves" WHERE ("userId" LIKE \'%%\') OR ("startDate" > :startDate) OR ("endDate" < :endDate) OR ("status" = :status)',
+            {
+                replacements: { userId: userId, startDate: startDate, endDate: endDate, status: status },
+                type: QueryTypes.UPDATE,
+                logging: console.log
+            });
 
         res.status(200).json({
             status: true,
             msg: "Success",
-            data: leave,
+            data: leave[0],
         });
     } catch (error) {
         next(error);

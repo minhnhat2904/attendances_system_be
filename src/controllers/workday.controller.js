@@ -15,6 +15,7 @@ const create = async (req, res, next) => {
             }
         });
         if (qrCode) {
+            console.log("1");
             const now = new Date().toISOString().slice(0, 10);
             const dateCreated = new Date(qrCode.createdAt).toISOString().slice(0, 10);
             if (now === dateCreated) {

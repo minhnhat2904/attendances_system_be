@@ -7,6 +7,7 @@ import { QRCode } from "./qrcode.model";
 import { Leave } from "./leave.model";
 import { Report } from "./report.model";
 import { UserPermission } from "./userPermission.model";
+import { Department } from "./Department.model";
 import Sequelize from "sequelize";
 
 const sequelize = new Sequelize(dbConfig.url, {
@@ -33,5 +34,6 @@ db.qrCode = QRCode(sequelize, Sequelize);
 db.workDay = WorkDay(sequelize, Sequelize);
 db.leave = Leave(sequelize, Sequelize);
 db.report = Report(sequelize, Sequelize);
+db.department = Department(sequelize, Sequelize);
 
 export { db }

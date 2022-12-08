@@ -4,3 +4,16 @@ admin,Get all users,GET_USERS,1
 admin,Update user,UPDATE_USERS,1
 admin,Delete user,DELETE_USER,1
 admin,Create qr code,CREATE_QR,1
+employee,Create work day,CREATE_WORKDAYS,1
+employee,Create report,CREATE_REPORTS,1
+employee,Get report,GET_REPORTS,1
+employee,Update report,UPDATE_REPORTS,1
+employee,Delete report,DELETE_REPORTS,1
+employee,Create request off,CREATE_LEAVES,1
+employee,Get request off,GET_LEAVES,1
+hr,Update user,UPDATE_USERS,1
+hr,Get work day,GET_WORKDAYS,1
+head_department,Get leave,GET_LEAVES,1
+head_department,Update leave,UPDATE_LEAVES,1
+accountancy,Get all user,GET_USERS,1
+accountancy,Get total hour work,GET_TOTAL_HOUR_WORK,1

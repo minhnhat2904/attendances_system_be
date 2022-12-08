@@ -13,7 +13,12 @@ const createUserRequest = (req, res, next) => {
   const schema = Joi.object({
     username: Joi.string().required(),
     password: Joi.string().alphanum().required().min(6).max(50),
-    role: Joi.string().required(),
+    role: Joi.required(),
+    department: Joi.required(),
+    name: Joi.string(),
+    birthday: Joi.string(),
+    phone: Joi.string(),
+    address: Joi.string(),
   });
 
   validateRequest(req, next, schema);

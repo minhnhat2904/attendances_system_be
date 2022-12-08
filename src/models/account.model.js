@@ -34,6 +34,15 @@ export const Account = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             required: true,
         },
+        department: {
+            type: Sequelize.STRING,
+            required: false,
+        },
+        remainHours: {
+            type: Sequelize.DOUBLE,
+            required: true,
+            defaultValue: 96
+        },
         deleted_flag: {
             type: Sequelize.BOOLEAN,
             defaultValue: false,

@@ -25,6 +25,7 @@ const login = async (req, res, next) => {
             username: user.username,
             id: user.id,
             role: user.role,
+            remainHours: user.remainHours
         };
 
         const token = tokenEncode(data);

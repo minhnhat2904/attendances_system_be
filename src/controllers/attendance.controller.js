@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs';
-import { request } from 'express';
 import { HttpError, tokenEncode } from '../utils';
 
 const attendance = async (req, res, next) => {

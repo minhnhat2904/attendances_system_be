@@ -56,10 +56,6 @@ const get = async (req, res, next) => {
     try {
         const userId = req.query.userId;
         let report = await Report.findAll({ where: {userId: userId, deletedFlag: false }})
-        
-        if (report.length === 0) {
-            throw new HttpError("Not found", 400);
-        }
 
         res.status(200).json({
             status: true,

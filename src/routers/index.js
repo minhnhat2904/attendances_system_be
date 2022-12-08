@@ -22,6 +22,12 @@ router.route('/api/users').post(
     adminController.createUser
 );
 
+router.route('/api/users').get(
+    jwtMiddleware,
+    checkPermission(ACTION_CODE.GET_USERS),
+    adminController.get
+);
+
 router.route('/api/users').put(
     jwtMiddleware,
     checkPermission(ACTION_CODE.UPDATE_USER),

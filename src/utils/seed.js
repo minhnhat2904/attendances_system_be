@@ -9,6 +9,7 @@ import csv from 'csv-parser';
 const Admin = db.admin;
 const Permission = db.permission;
 const UserPermission = db.userPermission;
+const Department = db.department;
 
 export const initAccountAdmin = async () => {
     try {
@@ -50,6 +51,32 @@ export const initAccountAdmin = async () => {
 		});
 		await Promise.all(permissions);
 		log.info(`Account admin has been created.`);
+    } catch (error) {
+        log.error(error);
+    }
+}
+
+export const initDepartment = async () => {
+    try {
+        const count = await Department.count();
+        if (count == 0) {
+            await Department.create({
+                name: 'Dept1'
+            });
+            await Department.create({
+                name: 'Dept2'
+            });
+            await Department.create({
+                name: 'Dept3'
+            });
+            await Department.create({
+                name: 'Dept4'
+            });
+            await Department.create({
+                name: 'Dept5'
+            });
+        }
+		log.info(`Departments has been created.`);
     } catch (error) {
         log.error(error);
     }
