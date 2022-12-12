@@ -21,8 +21,6 @@ const create = async (req, res, next) => {
             throw new HttpError('Cannot create leave permits.', 400);
         }
         const account = await Account.findOne({ where: { id: user.id } })
-        console.log(account.remainHours);
-        console.log((amountDay*8 + amountHour));
         await Account.update({
             remainHours: parseFloat(account.remainHours - (amountDay*8 + amountHour)).toFixed(1)
         }, { where: { id: account.id } })
@@ -75,7 +73,7 @@ const get = async (req, res, next) => {
         const { startDate, endDate, status, userId } = req.query;
         // let leave = await Leave.findAll({ where: { userId: userId, deletedFlag: false } })
         let leave = await db.sequelize.query(
-            'SELECT * FROM "leaves" WHERE ("userId" LIKE \'%%\') OR ("startDate" > :startDate) OR ("endDate" < :endDate) OR ("status" = :status)',
+            'SELECT * FROM "leaves" WHERE ("userId" = :userId) AND (("startDate" > :startDate) OR ("endDate" < :endDate)) AND ("status" = :status)',
             {
                 replacements: { userId: userId, startDate: startDate, endDate: endDate, status: status },
                 type: QueryTypes.UPDATE,

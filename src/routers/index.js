@@ -1,5 +1,5 @@
-import { authMiddleware, validateRequestBody, roleMiddleware } from '../middlewares';
-import { adminController, qrCodeController, workDayController, authController, reportController } from '../controllers';
+import { authMiddleware, validateRequestBody, roleMiddleware, uploadFile } from '../middlewares';
+import { adminController, qrCodeController, workDayController, authController, reportController, departmentController } from '../controllers';
 import { Router } from 'express';
 import constants from '../constants';
 import { leaveController } from '../controllers/leave.controller';
@@ -22,17 +22,23 @@ router.route('/api/users').post(
     adminController.createUser
 );
 
+router.route('/api/users/file').post(
+    jwtMiddleware,
+    checkPermission(ACTION_CODE.CREATE_USER),
+    uploadFile.single('file'),
+    adminController.createUserByFile
+);
+
 router.route('/api/users').get(
     jwtMiddleware,
     checkPermission(ACTION_CODE.GET_USERS),
     adminController.get
 );
 
-router.route('/api/users').put(
+router.route('/api/users/:id').put(
     jwtMiddleware,
-    checkPermission(ACTION_CODE.UPDATE_USER),
-    validateRequestBody.createUserRequest,
-    adminController.createUser
+    checkPermission(ACTION_CODE.UPDATE_USERS),
+    adminController.updateUser
 );
 
 // AUTH
@@ -153,4 +159,10 @@ router.route('/api/reports').delete(
 router.route('/api/totalHourWork').get(
     jwtMiddleware,
     workDayController.getTotalHourWork
+)
+
+// DEPARTMENT
+router.route('/api/departments').get(
+    jwtMiddleware,
+    departmentController.get
 )

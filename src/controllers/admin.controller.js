@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { HttpError, tokenEncode } from '../utils';
 import { db } from '../models';
 import QRCode from 'qrcode';
+import readXlsxFile from 'read-excel-file/node'
 
 const Admin = db.admin;
 const Account = db.account;
@@ -38,7 +39,7 @@ const login = async (req, res, next) => {
 }
 
 const createUser = async (req, res, next) => {
-	let { username, password, role, department } = req.body;
+	let { username, password, role, department, name, birthday, phone, address } = req.body;
 	role = role.join();
 	username = username.toLowerCase();
 	try {
@@ -48,9 +49,9 @@ const createUser = async (req, res, next) => {
         }
 		const hash = await bcrypt.hash(password, 12);
 		if (!hash) {
-            throw new HttpError('Fail', 400);
+            throw new HttpError('Failed', 400);
         }
-		const isExistDepartment = await Department.findOne({ where: { name: department } });
+		const isExistDepartment = await Department.findOne({ where: { id: department } });
 		if (!isExistDepartment) {
 			throw new HttpError('Not found department', 400);
 		}
@@ -59,7 +60,11 @@ const createUser = async (req, res, next) => {
 			username,
 			password: hash,
 			role: role,
-			department: isExistDepartment.id
+			department: isExistDepartment.id,
+			name,
+			birthday,
+			phone,
+			address
 		});
 		if (role.includes('head_department')) {
 			await isExistDepartment.update({userId: account.id});
@@ -88,41 +93,79 @@ const createUser = async (req, res, next) => {
 		next(error);
 	}
 }
-const updateUser = async (req, res, next) => {
-	let { username, password, role } = req.body;
-	username = username.toLowerCase();
-	try {
-		const isExist = await Account.findOne({ where: { username } });
-		if (isExist) {
-            throw new HttpError('Username is exist', 400);
-        }
-		const hash = await bcrypt.hash(password, 12);
-		if (!hash) {
-            throw new HttpError('Fail', 400);
-        }
-		const account = await Account.create({
-			username,
-			password: hash,
-			role: role,
-		});
-		let permissions = await Permission.findAll({where: {
-			role,
-			check: true,
-		}});
-		permissions = permissions.map((permission) => {
-			return UserPermission.create({
-				userId: account.id,
-				permissionId: permission.id,
-				permissionName: permission.permissionName,
-				actionCode: permission.actionCode,
-				check: true,
+
+const createUserByFile = async (req, res, next) => {
+	if (req.file == undefined) {
+		return res.status(400).send("Please upload an excel file!");
+	}
+	let path = __dirname + "/../resources/static/assets/uploads/" + req.file.filename;
+	readXlsxFile(path).then((rows) => {
+		rows.shift();
+
+		rows.forEach(async (row) => {
+			const isExistDepartment = await Department.findOne({ where: { name: row[6] } });
+			if (!isExistDepartment) {
+				throw new HttpError('Not found department', 400);
+			}
+			const role = row[5] + ''
+			const hash = await bcrypt.hash(row[1] + '', 12);
+			const account = await Account.create({
+				username: row[0],
+				password: hash,
+				role: row[5],
+				department: isExistDepartment.id,
+				name: row[2],
+				birthday: row[3] + '',
+				phone: row[4],
+				address: row[6]
 			});
-		});
-		await Promise.all(permissions);
+			if (role.includes('head_department')) {
+				await isExistDepartment.update({userId: account.id});
+				await isExistDepartment.save();
+			}
+			let permissions = await Permission.findAll({where: {
+				role,
+				check: true,
+			}});
+			permissions = permissions.map((permission) => {
+				return UserPermission.create({
+					userId: account.id,
+					permissionId: permission.id,
+					permissionName: permission.permissionName,
+					actionCode: permission.actionCode,
+					check: true,
+				});
+			});
+			await Promise.all(permissions);
+		})
+	});
+	res.status(200).json({
+		status: true,
+		message: 'Success',
+		data: "OK",
+	})
+}
+
+const updateUser = async (req, res, next) => {
+	let id = req.params.id;
+	try {
+		const isExist = await Account.findOne({ where: { id } });
+		if (!isExist) {
+            throw new HttpError('Account is not exist', 400);
+        }
+
+		const isExistDepartment = await Department.findOne({ where: { id: req.body.department } });
+		if (!isExistDepartment) {
+			throw new HttpError('Not found department', 400);
+		}
+		req.body.department = isExistDepartment.id;
+		req.body.role = req.body.role.join();
+		
+		const account = await Account.update(req.body, { where: { id }});
 
 		res.status(200).json({
 			status: true,
-			msg: 'Create user success',
+			msg: 'Update user success',
 		});
 	} catch (error) {
 		next(error);
@@ -140,7 +183,12 @@ const createQrCode = async (req, res, next) => {
 const get = async (req, res, next) => {
 	try {
         const department = req.query.department;
-        const users = await Account.findAll({ where: { department: department, deleted_flag: false } })
+		let users = [];
+		if (department == undefined) {
+			users = await Account.findAll({ where: { deleted_flag: false } })
+		} else {
+			users = await Account.findAll({ where: { department: department, deleted_flag: false } })
+		}
         return res.status(200).json({
             status: true,
             message: 'Success',
@@ -156,5 +204,6 @@ export const adminController = {
 	createUser,
 	updateUser,
 	createQrCode,
-	get
+	get,
+	createUserByFile
 };

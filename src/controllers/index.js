@@ -4,6 +4,7 @@ import { qrCodeController } from './qrcode.controller';
 import { workDayController } from './workday.controller';
 import { authController } from './auth.controller';
 import { reportController } from './report.controller';
+import { departmentController } from './department.controller';
 
 export {
   adminController,
@@ -11,5 +12,6 @@ export {
   qrCodeController,
   workDayController,
   authController,
-  reportController
+  reportController,
+  departmentController
 };

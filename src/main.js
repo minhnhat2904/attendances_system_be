@@ -2,6 +2,9 @@ import { HttpServer, envVariables } from "./configs";
 import { initAccountAdmin, initDepartment } from "./utils";
 import { db } from "../src/models";
 import log from 'datalog';
+import multer from "multer";
+
+let upload = multer();
 
 import {
     router
