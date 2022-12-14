@@ -7,7 +7,7 @@ import { QRCode } from "./qrcode.model";
 import { Leave } from "./leave.model";
 import { Report } from "./report.model";
 import { UserPermission } from "./userPermission.model";
-import { Department } from "./Department.model";
+import { Department } from "./department.model";
 import Sequelize from "sequelize";
 
 const sequelize = new Sequelize(dbConfig.url, {
