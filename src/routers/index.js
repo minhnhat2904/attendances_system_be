@@ -31,8 +31,13 @@ router.route('/api/users/file').post(
 
 router.route('/api/users').get(
     jwtMiddleware,
-    checkPermission(ACTION_CODE.GET_USERS),
+    // checkPermission(ACTION_CODE.GET_USERS),
     adminController.get
+);
+router.route('/api/users/getUserForAccountancy').get(
+    jwtMiddleware,
+    // checkPermission(ACTION_CODE.GET_USERS),
+    adminController.getUserForAccountancy
 );
 
 router.route('/api/users/:id').put(

@@ -70,20 +70,51 @@ const update = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const { startDate, endDate, status, userId } = req.query;
-        // let leave = await Leave.findAll({ where: { userId: userId, deletedFlag: false } })
+        const { startDate, endDate, status, userId, department, limit } = req.query;
+
+        let query = 'WHERE "leaves"."deletedFlag" = false';
+        query += (startDate == '') ? '' : ` AND "leaves"."startDate" > \'${startDate}\'`;
+        query += (endDate == '') ? '' : ` AND "leaves"."endDate" < \'${endDate}\'`;
+        query += (status == 3) ? '' : ` AND "leaves"."status" = \'${status}\'`;
+        query += (userId == '') ? '' : ` AND "leaves"."userId" = \'${userId}\'`;
+        query += (department == '') ? '' : ` AND "accounts"."department" = \'${department}\'`;
+
         let leave = await db.sequelize.query(
-            'SELECT * FROM "leaves" WHERE ("userId" = :userId) AND (("startDate" > :startDate) OR ("endDate" < :endDate)) AND ("status" = :status)',
+            `
+                SELECT
+                    "leaves"."id",
+                    "leaves"."createdAt",
+                    "leaves"."startDate",
+                    "leaves"."endDate",
+                    "leaves"."amountDay",
+                    "leaves"."amountHour",
+                    "leaves"."typeOff",
+                    "leaves"."reason",
+                    "leaves"."reasonDetail",
+                    "leaves"."status",
+                    "leaves"."receiver",
+                    "accounts"."username",
+                    "accounts"."name",
+                    "accounts"."phone",
+                    "accounts"."address",
+                    "accounts"."role",
+                    "accounts"."department",
+                    "accounts"."remainHours"
+                FROM "leaves"
+                LEFT JOIN "accounts" ON "leaves"."userId"::text = "accounts"."id"::text
+                ${query}
+                ORDER BY "leaves"."createdAt" DESC
+                LIMIT ${limit} OFFSET 0;
+            `,
             {
-                replacements: { userId: userId, startDate: startDate, endDate: endDate, status: status },
-                type: QueryTypes.UPDATE,
+                type: QueryTypes.SELECT,
                 logging: console.log
             });
 
         res.status(200).json({
             status: true,
-            msg: "Success",
-            data: leave[0],
+            message: "Success",
+            data: leave,
         });
     } catch (error) {
         next(error);

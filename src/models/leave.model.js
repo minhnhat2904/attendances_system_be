@@ -19,11 +19,11 @@ export const Leave = (sequelize, Sequelize) => {
             required: true,
         },
         amountDay: {
-            type: Sequelize.STRING,
+            type: Sequelize.FLOAT,
             required: true,
         },
         amountHour: {
-            type: Sequelize.STRING,
+            type: Sequelize.FLOAT,
             required: true,
         },
         typeOff: {

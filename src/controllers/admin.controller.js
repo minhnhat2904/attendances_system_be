@@ -3,6 +3,7 @@ import { HttpError, tokenEncode } from '../utils';
 import { db } from '../models';
 import QRCode from 'qrcode';
 import readXlsxFile from 'read-excel-file/node'
+import { QueryTypes } from 'sequelize';
 
 const Admin = db.admin;
 const Account = db.account;
@@ -117,7 +118,7 @@ const createUserByFile = async (req, res, next) => {
 				name: row[2],
 				birthday: row[3] + '',
 				phone: row[4],
-				address: row[6]
+				address: row[7]
 			});
 			if (role.includes('head_department')) {
 				await isExistDepartment.update({userId: account.id});
@@ -183,12 +184,24 @@ const createQrCode = async (req, res, next) => {
 const get = async (req, res, next) => {
 	try {
         const department = req.query.department;
+		const username = req.query.username;
+
+		let query = 'WHERE "accounts"."deleted_flag" = false';
+		query += (department == undefined) ? '' : ` AND "accounts"."department" = \'${department}\'`;
+		query += (username == undefined) ? '' : ` AND "accounts"."username" LIKE \'%${username}%\'`;
+
 		let users = [];
-		if (department == undefined) {
-			users = await Account.findAll({ where: { deleted_flag: false } })
-		} else {
-			users = await Account.findAll({ where: { department: department, deleted_flag: false } })
-		}
+
+		users = await db.sequelize.query(
+			`
+				SELECT * FROM "accounts"
+				${query}
+			`,
+            {
+                type: QueryTypes.SELECT,
+                logging: console.log
+            });
+
         return res.status(200).json({
             status: true,
             message: 'Success',
@@ -199,11 +212,74 @@ const get = async (req, res, next) => {
     }
 }
 
+const getUserForAccountancy = async (req, res, next) => {
+	try {
+		const department = req.query.department;
+		const username = req.query.username;
+
+		let query = 'WHERE "accounts"."deleted_flag" = false';
+		query += (department == undefined) ? '' : ` AND ("accounts"."department" = \'${department}\'`;
+		query += (username == undefined) ? '' : ` OR "accounts"."username" LIKE \'%${username}%\')`;
+
+		let users = [];
+
+		let result = await db.sequelize.query(
+			`
+				SELECT * FROM "accounts"
+				${query}
+			`,
+            {
+                type: QueryTypes.SELECT,
+                logging: console.log
+            }
+		);
+		
+		for (let index = 0; index < result.length; index++) {
+			let hourOffAnnual = await db.sequelize.query(
+				`
+					SELECT SUM(CAST("leaves"."amountDay" AS DECIMAL )) AS d, SUM(CAST("leaves"."amountHour" AS DECIMAL )) AS h FROM "leaves"
+					WHERE "leaves"."typeOff" = 'Annual leave';
+				`,
+				{
+					type: QueryTypes.SELECT,
+				}
+			);
+			let hourOffUnpaid = await db.sequelize.query(
+				`
+					SELECT SUM(CAST("leaves"."amountDay" AS DECIMAL )) AS d, SUM(CAST("leaves"."amountHour" AS DECIMAL )) AS h FROM "leaves"
+					WHERE "leaves"."typeOff" = 'Unpaid leave' AND "leaves"."userId" = :userId;
+				`,
+				{
+					replacements: { userId: result[index].id},
+					type: QueryTypes.SELECT,
+				}
+			);
+			console.log(hourOffUnpaid);
+			let user = {
+				name: result[index].name,
+				username: result[index].username,
+				hours_off_annual: Number(hourOffAnnual[0].d) * 8 + Number(hourOffAnnual[0].h),
+				hours_off_unpaid: Number(hourOffUnpaid[0].d) * 8 + Number(hourOffUnpaid[0].h),
+			}
+			users.push(user);
+		}
+
+        return res.status(200).json({
+            status: true,
+            message: 'Success',
+            data: users
+        })
+	} catch (error) {
+		console.log(error);
+	}
+}
+
 export const adminController = {
 	login,
 	createUser,
 	updateUser,
 	createQrCode,
 	get,
-	createUserByFile
+	createUserByFile,
+	getUserForAccountancy
 };

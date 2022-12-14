@@ -54,8 +54,20 @@ const update = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const userId = req.query.userId;
-        let report = await Report.findAll({ where: {userId: userId, deletedFlag: false }})
+        const { userId, startDate, endDate } = req.query;
+        let query = 'WHERE "reports"."deletedFlag" = false';
+        query += (startDate == '') ? '' : ` AND "reports"."date" >= \'${startDate}\'`;
+        query += (endDate == '') ? '' : ` AND "reports"."date" <= \'${endDate}\'`;
+        query += (userId == '') ? '' : ` AND "reports"."userId" = \'${userId}\'`;
+        let report = await db.sequelize.query(
+			`
+				SELECT * FROM "reports"
+				${query}
+			`,
+            {
+                type: QueryTypes.SELECT,
+                logging: console.log
+            });
 
         res.status(200).json({
             status: true,
