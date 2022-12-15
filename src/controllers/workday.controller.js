@@ -6,7 +6,7 @@ const WorkDay = db.workDay;
 const QRCode = db.qrCode;
 
 const create = async (req, res, next) => {
-    let key = req.body.key;
+    let key = JSON.parse(Object.keys(req.body)[0]).key;
     console.log(key);
     const user = req.user;
     try {
@@ -27,7 +27,6 @@ const create = async (req, res, next) => {
                         type: QueryTypes.SELECT,
                         logging: console.log
                     });
-                    console.log(alreadyAttendances);
                 if (alreadyAttendances.length !== 0) {
                     throw new HttpError('You are already attendances today', 400);
                 }
@@ -39,6 +38,7 @@ const create = async (req, res, next) => {
                     insertedBy: user.username,
                     status: 1
                 });
+                console.log(workDay);
                 return res.status(200).json({
                     status: true,
                     message: 'Success',
