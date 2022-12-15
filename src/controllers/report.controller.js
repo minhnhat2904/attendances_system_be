@@ -78,6 +78,41 @@ const get = async (req, res, next) => {
         next(error);
     }
 }
+const getAll = async (req, res, next) => {
+    try {
+        const { department, startDate, endDate } = req.query;
+        let query = 'WHERE "reports"."deletedFlag" = false';
+        query += (startDate == '') ? '' : ` AND ("reports"."date" <= \'${startDate}\'`;
+        query += (endDate == '') ? '' : ` AND "reports"."date" >= \'${endDate}\'`;
+        query += (department == '') ? '' : ` AND "accounts"."department" = \'${department}\'`;
+        let report = await db.sequelize.query(
+			`
+				SELECT 
+                    "reports"."date",
+                    "reports"."time",
+                    "reports"."task",
+                    "reports"."ticket",
+                    "reports"."project",
+                    "reports"."note",
+                    "accounts"."username"
+                FROM "reports"
+                LEFT JOIN "accounts" ON "reports"."userId"::text = "accounts"."id"::text
+				${query}
+			`,
+            {
+                type: QueryTypes.SELECT,
+                logging: console.log
+            });
+
+        res.status(200).json({
+            status: true,
+            msg: "Success",
+            data: report,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 const getById = async (req, res, next) => {
     try {
@@ -126,6 +161,7 @@ export const reportController = {
 	create,
     update,
     get,
+    getAll,
     getById,
     destroy,
 };

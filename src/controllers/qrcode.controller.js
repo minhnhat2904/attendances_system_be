@@ -13,7 +13,16 @@ cloudinary.v2.config({
 const QRCodeDB = db.qrCode;
 
 const create = async (req, res, next) => {
-	let key = generator.generate({length: 10, numbers: true});;
+    const qr = await db.sequelize.query('SELECT * FROM "qrCodes" WHERE "createdAt"::date = :createdAt AND "deletedFlag" = false',
+        {
+            replacements: { createdAt: new Date() },
+            type: QueryTypes.SELECT,
+            logging: console.log
+        });
+    if (qr.length > 0) {
+        return res.status(400).send({ message: 'Failed to create qr code!' });
+    }
+    let key = generator.generate({ length: 10, numbers: true });;
     let urlBase = await QRCode.toDataURL(key);
     let url = '';
 
@@ -42,28 +51,48 @@ const create = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const createdAt = req.query.createdAt;
         const qr = await db.sequelize.query('SELECT * FROM "qrCodes" WHERE "createdAt"::date = :createdAt AND "deletedFlag" = false',
             {
-                replacements: { createdAt: createdAt },
+                replacements: { createdAt: new Date() },
                 type: QueryTypes.SELECT,
                 logging: console.log
             });
         if (qr.length === 0) {
-            throw new HttpError("Not found", 400);
-        }
+            let key = generator.generate({ length: 10, numbers: true });;
+            let urlBase = await QRCode.toDataURL(key);
+            let url = '';
 
-        res.status(200).json({
-            status: true,
-            msg: "Success",
-            data: qr,
-        });
+            const success = await cloudinary.v2.uploader.upload(urlBase, {
+                resource_type: "image",
+                folder: "QRCode"
+            })
+            if (success) {
+                url = success.url;
+                const qrCode = await QRCodeDB.create({
+                    url,
+                    key
+                });
+                res.status(200).json({
+                    status: true,
+                    msg: "Success",
+                    data: qrCode,
+                });
+            } else {
+                return res.status(400).send({ message: 'Failed to create qr code!' });
+            }
+        } else {
+            res.status(200).json({
+                status: true,
+                msg: "Success",
+                data: qr[0],
+            });
+        }
     } catch (error) {
         next(error);
     }
 }
 
 export const qrCodeController = {
-	create,
+    create,
     get
 };

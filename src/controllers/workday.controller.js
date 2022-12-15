@@ -7,7 +7,6 @@ const QRCode = db.qrCode;
 
 const create = async (req, res, next) => {
     let key = JSON.parse(Object.keys(req.body)[0]).key;
-    console.log(key);
     const user = req.user;
     try {
         const qrCode = await db.sequelize.query(`
@@ -90,6 +89,40 @@ const getById = async (req, res, next) => {
     }
 }
 
+const getByDepartment = async (req, res, next) => {
+    try {
+        const { department } = req.params;
+        const { startDate, endDate } = req.query;
+        let query = 'WHERE "workDays"."deletedFlag" = false';
+        query += (startDate == '') ? '' : ` AND "workDays"."createdAt" <= \'${startDate}\'`;
+        query += (endDate == '') ? '' : ` AND "workDays"."createdAt" >= \'${endDate}\'`;
+        query += (department == '') ? '' : ` AND "accounts"."department" = \'${department}\'`;
+        let report = await db.sequelize.query(
+			`
+				SELECT 
+                    "workDays"."checkIn",
+                    "workDays"."checkOut",
+                    "workDays"."createdAt",
+                    "accounts"."username"
+                FROM "workDays"
+                LEFT JOIN "accounts" ON "workDays"."userId"::text = "accounts"."id"::text
+				${query}
+			`,
+            {
+                type: QueryTypes.SELECT,
+                logging: console.log
+            });
+
+        res.status(200).json({
+            status: true,
+            msg: "Success",
+            data: report,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 const update = async (req, res, next) => {
     const id = req.params.id;
     try {
@@ -143,5 +176,6 @@ export const workDayController = {
     getById,
     update,
     destroy,
-    getTotalHourWork
+    getTotalHourWork,
+    getByDepartment
 };

@@ -79,7 +79,6 @@ router.route('/api/qrcodes').post(
 );
 
 router.route('/api/qrCodes').get(
-    jwtMiddleware,
     qrCodeController.get
 )
 
@@ -97,6 +96,10 @@ router.route('/api/workdays').get(
 router.route('/api/workdays/:id').get(
     jwtMiddleware,
     workDayController.getById
+)
+router.route('/api/workdays/department/:department').get(
+    jwtMiddleware,
+    workDayController.getByDepartment
 )
 
 router.route('/api/workdays/:id').put(
@@ -149,6 +152,10 @@ router.route('/api/reports/:id').put(
 router.route('/api/reports').get(
     jwtMiddleware,
     reportController.get
+)
+router.route('/api/allReports').get(
+    jwtMiddleware,
+    reportController.getAll
 )
 
 router.route('/api/reports/:id').get(
