@@ -7,29 +7,32 @@ const QRCode = db.qrCode;
 
 const create = async (req, res, next) => {
     let key = req.body.key;
+    console.log(key);
     const user = req.user;
     try {
-        const qrCode = await QRCode.findOne({
-            where: {
-                key,
-            }
+        const qrCode = await db.sequelize.query(`
+            SELECT * FROM "public"."qrCodes" WHERE "key" = '${key}';
+        `,
+        {
+            type: QueryTypes.SELECT,
+            logging: console.log
         });
         if (qrCode) {
-            console.log("1");
             const now = new Date().toISOString().slice(0, 10);
-            const dateCreated = new Date(qrCode.createdAt).toISOString().slice(0, 10);
+            const dateCreated = new Date(qrCode[0].createdAt).toISOString().slice(0, 10);
             if (now === dateCreated) {
                 const alreadyAttendances = await db.sequelize.query('SELECT * FROM "workDays" WHERE "userId" = :userId AND "qrCodeId" = :qrCodeId AND "deletedFlag" = false',
                     {
-                        replacements: { userId: req.user.id, qrCodeId: qrCode.id },
+                        replacements: { userId: req.user.id, qrCodeId: qrCode[0].id },
                         type: QueryTypes.SELECT,
                         logging: console.log
                     });
-                if (alreadyAttendances) {
+                    console.log(alreadyAttendances);
+                if (alreadyAttendances.length !== 0) {
                     throw new HttpError('You are already attendances today', 400);
                 }
                 const workDay = await WorkDay.create({
-                    qrCodeId: qrCode.id,
+                    qrCodeId: qrCode[0].id,
                     userId: user.id,
                     checkIn: new Date(),
                     checkOut: (new Date()).setHours(17, 0, 0, 0),
