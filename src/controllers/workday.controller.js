@@ -7,7 +7,7 @@ const QRCode = db.qrCode;
 
 const create = async (req, res, next) => {
     console.log(req.body);
-    let key = JSON.parse(Object.keys(req.body)[0]).key;
+    let key = req.body.key;
     const user = req.user;
     try {
         const qrCode = await db.sequelize.query(`
