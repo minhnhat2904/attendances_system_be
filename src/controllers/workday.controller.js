@@ -6,6 +6,7 @@ const WorkDay = db.workDay;
 const QRCode = db.qrCode;
 
 const create = async (req, res, next) => {
+    console.log(req.body);
     let key = JSON.parse(Object.keys(req.body)[0]).key;
     const user = req.user;
     try {
@@ -37,7 +38,6 @@ const create = async (req, res, next) => {
                     insertedBy: user.username,
                     status: 1
                 });
-                console.log(workDay);
                 return res.status(200).json({
                     status: true,
                     message: 'Success',
