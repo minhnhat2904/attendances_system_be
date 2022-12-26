@@ -34,7 +34,7 @@ const create = async (req, res, next) => {
                     qrCodeId: qrCode[0].id,
                     userId: user.id,
                     checkIn: new Date(),
-                    checkOut: (new Date()).setHours(17, 0, 0, 0),
+                    checkOut: (new Date()).setHours(10, 0, 0, 0),
                     insertedBy: user.username,
                     status: 1
                 });
