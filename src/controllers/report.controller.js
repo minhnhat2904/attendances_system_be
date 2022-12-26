@@ -98,6 +98,7 @@ const getAll = async (req, res, next) => {
                 FROM "reports"
                 LEFT JOIN "accounts" ON "reports"."userId"::text = "accounts"."id"::text
 				${query}
+                ORDER BY "reports"."createdAt" DESC
 			`,
             {
                 type: QueryTypes.SELECT,
