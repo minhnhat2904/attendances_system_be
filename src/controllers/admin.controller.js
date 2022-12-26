@@ -238,9 +238,10 @@ const getUserForAccountancy = async (req, res, next) => {
 			let hourOffAnnual = await db.sequelize.query(
 				`
 					SELECT SUM(CAST("leaves"."amountDay" AS DECIMAL )) AS d, SUM(CAST("leaves"."amountHour" AS DECIMAL )) AS h FROM "leaves"
-					WHERE "leaves"."typeOff" = 'Annual leave';
+					WHERE "leaves"."typeOff" = 'Annual leave' AND "leaves"."userId" = :userId;
 				`,
 				{
+					replacements: { userId: result[index].id},
 					type: QueryTypes.SELECT,
 				}
 			);
