@@ -97,7 +97,7 @@ const getByDepartment = async (req, res, next) => {
         query += (startDate == '') ? '' : ` AND "workDays"."createdAt" <= \'${startDate}\'`;
         query += (endDate == '') ? '' : ` AND "workDays"."createdAt" >= \'${endDate}\'`;
         query += (department == '') ? '' : ` AND "accounts"."department" = \'${department}\'`;
-        query += ' ORDER BY DESC "createdAt"';
+        query += ' ORDER BY "workDays"."createdAt" DESC';
         let report = await db.sequelize.query(
 			`
 				SELECT 
