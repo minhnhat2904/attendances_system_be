@@ -57,11 +57,20 @@ const update = async (req, res, next) => {
         if (!leave) {
             throw new HttpError('Cannot update leave permits.', 400);
         }
+        let getLeave = await Leave.findOne({ where: { id: id, deletedFlag: false } })
+        const account = await Account.findOne({ where: { id: getLeave.userId } })
+        console.log(parseFloat(account.remainHours));
+        console.log(parseFloat(getLeave.amountDay)*8);
+        console.log(parseFloat(getLeave.amountHour));
+        console.log(parseFloat(account.remainHours) + parseFloat(getLeave.amountDay)*8 + parseFloat(getLeave.amountHour));
+        await Account.update({
+            remainHours: parseFloat(account.remainHours) + parseFloat(getLeave.amountDay)*8 + parseFloat(getLeave.amountHour)
+        }, { where: { id: account.id } })
 
         return res.status(200).json({
             status: true,
             message: 'Success',
-            data: leave
+            data: 'leave'
         })
     } catch (error) {
         next(error);

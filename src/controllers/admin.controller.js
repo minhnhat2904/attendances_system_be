@@ -194,7 +194,7 @@ const get = async (req, res, next) => {
 
 		users = await db.sequelize.query(
 			`
-				SELECT * FROM "accounts"
+				SELECT DISTINCT * FROM "accounts"
 				${query}
 			`,
             {
@@ -261,7 +261,8 @@ const getUserForAccountancy = async (req, res, next) => {
 				hours_off_annual: Number(hourOffAnnual[0].d) * 8 + Number(hourOffAnnual[0].h),
 				hours_off_unpaid: Number(hourOffUnpaid[0].d) * 8 + Number(hourOffUnpaid[0].h),
 			}
-			users.push(user);
+			const found = users.some(el => el.username === user.username);
+			if(!found) users.push(user);
 		}
 
         return res.status(200).json({
