@@ -216,6 +216,7 @@ const getUserForAccountancy = async (req, res, next) => {
 	try {
 		const department = req.query.department;
 		const username = req.query.username;
+		const month = req.query.month;
 
 		let query = 'WHERE "accounts"."deleted_flag" = false';
 		query += (department == undefined) ? '' : ` AND ("accounts"."department" = \'${department}\'`;
@@ -238,20 +239,20 @@ const getUserForAccountancy = async (req, res, next) => {
 			let hourOffAnnual = await db.sequelize.query(
 				`
 					SELECT SUM(CAST("leaves"."amountDay" AS DECIMAL )) AS d, SUM(CAST("leaves"."amountHour" AS DECIMAL )) AS h FROM "leaves"
-					WHERE "leaves"."typeOff" = 'Annual leave' AND "leaves"."userId" = :userId;
+					WHERE "leaves"."typeOff" = 'Annual leave' AND "leaves"."userId" = :userId AND to_char("createdAt", 'MM')::text = :month;
 				`,
 				{
-					replacements: { userId: result[index].id},
+					replacements: { userId: result[index].id, month: month},
 					type: QueryTypes.SELECT,
 				}
 			);
 			let hourOffUnpaid = await db.sequelize.query(
 				`
 					SELECT SUM(CAST("leaves"."amountDay" AS DECIMAL )) AS d, SUM(CAST("leaves"."amountHour" AS DECIMAL )) AS h FROM "leaves"
-					WHERE "leaves"."typeOff" = 'Unpaid leave' AND "leaves"."userId" = :userId;
+					WHERE "leaves"."typeOff" = 'Unpaid leave' AND "leaves"."userId" = :userId AND to_char("createdAt", 'MM')::text = :month;
 				`,
 				{
-					replacements: { userId: result[index].id},
+					replacements: { userId: result[index].id, month: month},
 					type: QueryTypes.SELECT,
 				}
 			);
